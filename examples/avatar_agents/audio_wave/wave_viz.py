@@ -55,7 +55,9 @@ class WaveformVisualizer:
 
         # Convert audio to frequency domain using FFT
         normalized_samples = audio_samples.astype(np.float32) / 32767.0
-        normalized_samples = normalized_samples.mean(axis=1)
+        # Handle both mono and stereo audio
+        if len(normalized_samples.shape) > 1:
+            normalized_samples = normalized_samples.mean(axis=1)
 
         if len(normalized_samples) >= self.n_fft:
             window = np.hanning(self.n_fft)

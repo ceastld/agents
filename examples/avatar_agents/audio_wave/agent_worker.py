@@ -13,7 +13,7 @@ from livekit.agents.voice import Agent, AgentSession
 from livekit.agents.voice.avatar import DataStreamAudioOutput
 from livekit.agents.voice.io import PlaybackFinishedEvent
 from livekit.agents.voice.room_io import ATTRIBUTE_PUBLISH_ON_BEHALF, RoomOutputOptions
-from livekit.plugins import openai
+from livekit.plugins import deepgram, google, silero, elevenlabs
 
 logger = logging.getLogger("avatar-example")
 logger.setLevel(logging.INFO)
@@ -68,10 +68,12 @@ async def entrypoint(ctx: JobContext, avatar_dispatcher_url: str):
 
     agent = Agent(instructions="Talk to me!")
     session = AgentSession(
-        llm=openai.realtime.RealtimeModel(),
-        # stt=deepgram.STT(),
-        # llm=openai.LLM(model="gpt-4o-mini"),
-        # tts=cartesia.TTS(),
+        vad=silero.VAD.load(),
+        # any combination of STT, LLM, TTS, or realtime API can be used
+        stt=deepgram.STT(model="nova-2", language="zh"),
+        llm=google.LLM(model="gemini-2.0-flash-001"),
+        tts=elevenlabs.TTS(language="zh"),
+        allow_interruptions=False,
     )
 
     # wait for the participant to join the room and the avatar worker to connect
